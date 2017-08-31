@@ -1,4 +1,3 @@
-
 var fs = require('fs');
 //var url = require('url');
 var os = require('os');
@@ -6,6 +5,7 @@ var platform = os.platform();
 var arch = os.arch();
 
 var path = require('path');
+var { spawn } = require('child_process');
 
 //var installerURL = 'http://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/';
 var CURRENT_DIR = process.cwd();
@@ -23,12 +23,26 @@ function IfxNodeJsInstall()
     if (PreBuiltFound == false )
     {
         console.log('No prebuilt binaries available for platform=' + 
-                                platform + 'with architecture='+ arch);
+                                platform + ' with architecture='+ arch);
         console.log('You may try local build steps to build the driver on this platform');
         console.log('For building the driver from its source you may run ');
         console.log('node installer/IfxDriverBuild.js');
-        //return(false);
-        process.exit(1);
+        console.log("Trying to build it for you...");
+        const buildProc = spawn('node', ['installer/IfxDriverBuild.js']);
+         
+       buildProc.stdout.on('data', (data) => {
+          console.log(`stdout: ${data}`);
+        });
+
+        buildProc.stderr.on('data', (data) => {
+          console.log(`stderr: ${data}`);
+        });
+
+        buildProc.on('close', (code) => {
+          console.log(`build process exited with code ${code}`);
+        }); 
+
+        //process.exit(1);
     }
 
     function UnZipPreBuilts()
@@ -48,6 +62,7 @@ function IfxNodeJsInstall()
             {
                 PlatformDir = 'Linux64';
             }
+
             // if (arch == 'arm64')
             // {
             //     PlatformDir = 'Arm64';

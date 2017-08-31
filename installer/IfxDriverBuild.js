@@ -83,7 +83,7 @@ function IfxNodeJsBuild()
 
     function buildBinary()
     {
-        var buildString = "node-gyp configure build";
+        var buildString = "node-gyp configure build -v";
 
         var childProcess = exec(buildString, function (error, stdout, stderr)
         {
